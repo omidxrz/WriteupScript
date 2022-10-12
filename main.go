@@ -12,15 +12,29 @@ import (
 	_"github.com/lib/pq"
     "database/sql"
 	"os"
+	"github.com/ilyakaznacheev/cleanenv"
 )
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "postgres"
-	password = "postgres"
-	dbname   = "writeup"
-	webhook = "YourWebHookURL"
-)
+
+
+// Config Settings
+type Config struct {
+    Discord struct {
+        WebHook string `yaml:"WebHook"`
+    } `yaml:"Discord"`
+
+    Database struct {
+        Host string `yaml:"Host"`
+        Port int `yaml:"Port"`
+		User string `yaml:"User"`
+        Password string `yaml:"Password"`
+        DatabaseName string `yaml:"DatabaseName"`
+    } `yaml:"Database"`
+}
+var cfg Config
+var err = cleanenv.ReadConfig("./config.yml", &cfg)
+// Config Settings
+
+
 var (
     WarningLogger *log.Logger
     InfoLogger    *log.Logger
@@ -94,7 +108,7 @@ func GetWriteUps(WeblogURL string) [][]string {
 func CheckPost(Writeups [][]string ) int {
 
 	// Database
-	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",host, port, user, password, dbname)
+	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",cfg.Database.Host, cfg.Database.Port, cfg.Database.User, cfg.Database.Password, cfg.Database.DatabaseName)
 	
 	db, err := sql.Open("postgres", psqlconn)
 	CheckError(err)
@@ -150,7 +164,7 @@ func DiscordServer(title string, link string, pub_date string)  {
 		}`)
 
     json := fmt.Sprintf(string(rawJSON), title, link)
-	req, err := http.NewRequest("POST", webhook, bytes.NewBuffer([]byte(json)))
+	req, err := http.NewRequest("POST", cfg.Discord.WebHook, bytes.NewBuffer([]byte(json)))
 	CheckError(err)
 	req.Header.Add("Content-Type", "application/json")
 
@@ -180,7 +194,6 @@ func main() {
     // InfoLogger.Println("Something noteworthy happened")
     // WarningLogger.Println("There is something you should know about")
     // ErrorLogger.Println("Something went wrong")
-
 
 
 	// Read Resources File
