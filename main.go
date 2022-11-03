@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/xml"
+	"encoding/json"
 	"fmt"
 	_"time"
 	"io/ioutil"
@@ -18,6 +19,11 @@ import (
 
 // Config Settings
 type Config struct {
+	Telegram struct {
+        Token string `yaml:"Token"`
+        ChatID int `yaml:"ChatID"`
+    } `yaml:"Telegram"`
+
     Discord struct {
         WebHook string `yaml:"WebHook"`
     } `yaml:"Discord"`
@@ -146,6 +152,8 @@ func CheckPost(Writeups [][]string ) int {
 			CheckError(err)
 			InfoLogger.Println("Added To Database: ",title)
 			DiscordServer(title, link, pub_date)
+			TelegramChannel(title, link, pub_date)
+
 			
 			result = result + 1
 			// return result
@@ -174,6 +182,27 @@ func DiscordServer(title string, link string, pub_date string)  {
 	InfoLogger.Println("Added To Discord: ",title)
 	defer res.Body.Close()
 }
+func TelegramChannel(title string, link string, pub_date string)  {
+
+	URL := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", cfg.Telegram.Token)
+
+	Text := fmt.Sprintf("%s\n%s\n%s", title, pub_date, link )
+
+	body, _ := json.Marshal(map[string]interface{}{
+		"chat_id": cfg.Telegram.ChatID,
+		"text" : Text,
+		"parse_mode" : "Markdown",
+	})
+	
+	req, err := http.Post(
+		URL,
+		"application/json",
+		bytes.NewBuffer(body),
+	)
+	CheckError(err)
+	InfoLogger.Println("Added To Telegram Channel: ",title)
+	defer req.Body.Close()
+}
 
 
 
@@ -190,6 +219,11 @@ func logger() {
 func main() {
 	// Start Logger Function
 	logger()
+	title := "bug bounty writeup"
+	link := "https://google.com"
+	pub_date := "19:18"
+
+	TelegramChannel(title, link, pub_date)
 	// InfoLogger.Println("Starting the application...")
     // InfoLogger.Println("Something noteworthy happened")
     // WarningLogger.Println("There is something you should know about")

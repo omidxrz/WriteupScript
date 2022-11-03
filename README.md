@@ -10,5 +10,6 @@ go script for check some medium user and tags then add to database and send it t
 - go Version 
 - Postgrsql
 ```shell
-go get github.com/lib/pq
+go mod download github.com/lib/pq
+go get github.com/ilyakaznacheev/cleanenv@v1.4.0
 ```
