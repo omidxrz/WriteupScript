@@ -10,7 +10,8 @@ Example for runing every 3 hours:
 ```
  0 */3 * * * cd ~/path/WriteupScript/;/usr/bin/go run main.go
 ```
-
+Telegram Channel :
+https://t.me/WriteupScript
 ## Requirements
 - go Version 1.19
 - Postgrsql
