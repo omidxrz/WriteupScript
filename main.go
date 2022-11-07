@@ -166,21 +166,25 @@ func CheckPost(Writeups [][]string ) int {
 
 func DiscordServer(title string, link string, pub_date string)  {
 
-	rawJSON := []byte(`{
-		"content": "[%s](%s)",
-		"embeds": null
-		}`)
+	// rawJSON := []byte(`{
+	// 	"content": "[%s](%s)",
+	// 	"embeds": null
+	// 	}`)
 
-    json := fmt.Sprintf(string(rawJSON), title, link)
-	req, err := http.NewRequest("POST", cfg.Discord.WebHook, bytes.NewBuffer([]byte(json)))
-	CheckError(err)
-	req.Header.Add("Content-Type", "application/json")
+	Text := fmt.Sprintf("%s\n%s\n%s", title, pub_date, link )
 
-	client := &http.Client{}
-	res, err := client.Do(req)
+	body, _ := json.Marshal(map[string]interface{}{
+		"content": Text,
+	})
+	req, err := http.Post(
+		cfg.Discord.WebHook,
+		"application/json",
+		bytes.NewBuffer(body),
+	)
 	CheckError(err)
 	InfoLogger.Println("Added To Discord: ",title)
-	defer res.Body.Close()
+	defer req.Body.Close()
+
 }
 func TelegramChannel(title string, link string, pub_date string)  {
 
@@ -219,11 +223,7 @@ func logger() {
 func main() {
 	// Start Logger Function
 	logger()
-	title := "bug bounty writeup"
-	link := "https://google.com"
-	pub_date := "19:18"
 
-	TelegramChannel(title, link, pub_date)
 	// InfoLogger.Println("Starting the application...")
     // InfoLogger.Println("Something noteworthy happened")
     // WarningLogger.Println("There is something you should know about")

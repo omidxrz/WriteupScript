@@ -1,8 +1,12 @@
-# Server configurations
-Discord:
-  WebHook: "YourWebHookURL"
+# Tokens 
+Telegram:
+  Token: "Token"
+  ChatID: ChatID
 
-# Database credentials
+Discord:
+  WebHook: "DiscordWebHook"
+
+# Database 
 Database:
   Host: "localhost"
   Port: 5432
