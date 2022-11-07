@@ -1,5 +1,5 @@
 # WriteupScript
-go script for check some medium user and tags then add to database and send it to discord server.
+go script for check writeups in medium then add to database and send it to discord server or telegram.
 
 ## Setup
 - PostgreSQL
